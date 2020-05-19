@@ -8,7 +8,7 @@ const App: React.FC = () => {
   const [message, setMessage] = useState<string>('Loading...');
 
   const fetchDataAction = async () => {
-    const url: string = '/api';
+    const url: string = '/api/v1/stuff';
     const response = await fetch(url);
     const data = await response.json();
     setMessage(data.data);

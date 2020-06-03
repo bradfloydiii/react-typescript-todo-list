@@ -1,43 +1,56 @@
-import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
+import React, { useState } from 'react';
+import { Container, Row, Col } from 'reactstrap';
+import { TodoList } from './components/TodoList/TodoList';
+import { AddTodo } from './components/AddTodo/AddTodo';
+import { ITodo, ToggleTodo, RemoveTodo } from './types';
 import './App.css';
-import { AddTodo } from './components/addtodo';
-import { TodoList } from './components/todolist';
 
-const App: React.FC = () => {
-  const [message, setMessage] = useState<string>('Loading...');
+const App = () => {
+  const [todos, setTodos] = useState<ITodo[]>([]);
 
-  const fetchDataAction = async () => {
-    const url: string = '/api/v1/stuff';
-    const response = await fetch(url);
-    const data = await response.json();
-    setMessage(data.data);
+  const addTodo = (text: string) => {
+    const newTodos: ITodo[] = [...todos, { text, complete: false }];
+    setTodos(newTodos);
   };
 
-  useEffect(() => {
-    fetchDataAction();
-  });
+  const removeTodo: RemoveTodo = selectedTodo => {
+    const newTodos: ITodo[] = todos.filter(todo => todo !== selectedTodo);
+    setTodos(newTodos);
+  };
+
+  const toggleTodo: ToggleTodo = selectedTodo => {
+    const newTodos = todos.map((todo: ITodo) => {
+      if (todo === selectedTodo) {
+        return {
+          ...todo,
+          complete: !todo.complete
+        };
+      }
+      return todo;
+    });
+    setTodos(newTodos);
+  };
 
   return (
-    <div className='App'>
-      <header className='App-header'>
-        <img src={logo} className='App-logo' alt='logo' />
-        <h1>{message}</h1>
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <AddTodo />
-        <TodoList />
-        <a
-          className='App-link'
-          href='https://reactjs.org'
-          target='_blank'
-          rel='noopener noreferrer'
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container fluid={true}>
+      <Row>
+        <Col>
+          <h3>Todo List</h3>
+        </Col>
+      </Row>
+      <Row form={true}>
+        <Col>
+          <AddTodo addTodo={addTodo} />
+        </Col>
+      </Row>
+      <Row>
+        <TodoList
+          todos={todos}
+          toggleTodo={toggleTodo}
+          removeTodo={removeTodo}
+        />
+      </Row>
+    </Container>
   );
 };
 
